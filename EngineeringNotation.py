@@ -1,3 +1,7 @@
+import math
+
+__version__ = '1.0.1'
+
 class EngineeringNotation():
     si_prefixes = {
         -30: 'y',
