@@ -1,6 +1,6 @@
 import math
 
-__version__ = '1.0.2'
+__version__ = '1.0.3'
 
 class EngineeringNotation():
     si_prefixes = {
@@ -62,7 +62,7 @@ class EngineeringNotation():
         return exponent
     
     def get_si_form(self, unit: str = ''):
-        return f'{self.mantissa} {self.prefix}{unit}' if self.prefix is not None else f'{self.get_engieering_form()} {unit}'
+        return f'{self.mantissa} {self.prefix}{unit}' if self.prefix is not None else f'{self.mantissa} {unit}'
     
     def get_engieering_form(self, unit: str = ''):
         return f'{self.mantissa}E{self.engineering_exponent} {unit}'
