@@ -1,6 +1,6 @@
-import math
+from math import log10 as mathlog10
 
-__version__ = '1.1.0'
+__version__ = '1.2.0'
 
 _si_prefixes = {
     -60: 'yy', # *10^-60
@@ -24,7 +24,7 @@ _si_prefixes = {
     -6: 'μ', # *10^-6
     -3: 'm', # *10^-3
     0: None, # *10^0
-    3: 'K', # *10^3
+    3: 'k', # *10^3
     6: 'M', # *10^6
     9: 'G', # *10^9
     12: 'T', # *10^12
@@ -46,7 +46,7 @@ _si_prefixes = {
     60: 'QQ', # *10^60
 }
 
-def _get_engineering_exponent(number):
+def _get_engineering_exponent(number:float) -> int:
     """
     Calculate the engineering exponent of a given number.
     
@@ -58,12 +58,31 @@ def _get_engineering_exponent(number):
     """
     if number == 0:
         return 0
-    exponent = int(math.log10(abs(number)))
+    exponent = int(mathlog10(abs(number)))
     while exponent % 3 != 0:
         exponent -= 1
     return exponent
 
-def si_form(number: float, unit: str = '', round_to_decimal_places: int = 2):
+def _get_exp_str(exponent:int) -> str:
+    """
+    Handle printing positive, negative, and zero exponents
+
+    Parameters:
+        exponent (int): the exponent to be formatted for engineering notation
+
+    Returns:
+        str: formatted exponent, e.g. E+3 or E-2 or ''
+    """
+    signstr = ''
+    if exponent > 0:
+        signstr = f'E+{exponent}'
+    elif exponent < 0:
+        signstr = f'E{exponent}'
+    else:
+        signstr = ''
+    return signstr
+
+def si_form(number: float, unit: str = '', round_to_decimal_places: int = 2) -> str:
     """
     Format a number using SI prefixes.
     
@@ -80,7 +99,7 @@ def si_form(number: float, unit: str = '', round_to_decimal_places: int = 2):
     mantissa = round(number / 10 ** exponent, round_to_decimal_places)
     return f'{mantissa} {prefix}{unit}' if prefix is not None else f'{mantissa} {unit}'
 
-def engieering_form(number: float, unit: str = '', round_to_decimal_places: int = 2):
+def engineering_form(number: float, unit: str = '', round_to_decimal_places: int = 2) -> str:
     """
     Format a number using engineering notation.
     
@@ -94,14 +113,29 @@ def engieering_form(number: float, unit: str = '', round_to_decimal_places: int 
     """
     exponent = _get_engineering_exponent(number)
     mantissa = round(number / 10 ** exponent, round_to_decimal_places)
-    return f'{mantissa}E{exponent} {unit}'
+    return f'{mantissa}{_get_exp_str(exponent)} {unit}'
+
+# alias functions
+def sif(num:float, uni:str = '', prec:int = 2) -> str:
+    """
+    alias of si_form()
+    """
+    return si_form(num,unit=uni,round_to_decimal_places=prec)
+
+def engf(num:float, uni:str = '', prec:int = 2) -> str:
+    """
+    alias of engineering_form()
+    """
+    return engineering_form(num, unit=uni, round_to_decimal_places=prec)
 
 def _test():
     import random
     value = 15.504E4
     print(f'{value = }')
     print(f'{si_form(value, "V") = }')
-    print(f'{engieering_form(value, "V") = }')
+    print(f'{engineering_form(value, "V") = }')
+    print(f'{sif(value, "V") = }')
+    print(f'{engf(value, "V") = }')
 
 if __name__ == '__main__':
     try:
