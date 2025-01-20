@@ -1,6 +1,6 @@
 from math import log10 as mathlog10
 
-__version__ = '1.2.0'
+__version__ = '1.2.1'
 
 _si_prefixes = {
     -60: 'yy', # *10^-60
@@ -23,7 +23,7 @@ _si_prefixes = {
     -9: 'n', # *10^-9
     -6: 'μ', # *10^-6
     -3: 'm', # *10^-3
-    0: None, # *10^0
+    0: None, # *10^0, None type makes formatting easier
     3: 'k', # *10^3
     6: 'M', # *10^6
     9: 'G', # *10^9
@@ -59,7 +59,9 @@ def _get_engineering_exponent(number:float) -> int:
     if number == 0:
         return 0
     exponent = int(mathlog10(abs(number)))
-    while exponent % 3 != 0:
+    if exponent < 0: # force values smaller than E-3 to use the next smaller exp, e.g. 99E-6 instead of 0.99E-3
+        exponent -= 1
+    while exponent % 3 != 0: # find next smallest mult of 3 for exponent
         exponent -= 1
     return exponent
 
@@ -75,9 +77,9 @@ def _get_exp_str(exponent:int) -> str:
     """
     signstr = ''
     if exponent > 0:
-        signstr = f'E+{exponent}'
+        signstr = f'E+{exponent}' # manually add in the + sign
     elif exponent < 0:
-        signstr = f'E{exponent}'
+        signstr = f'E{exponent}' # negative is included in autoformat
     else:
         signstr = ''
     return signstr
@@ -90,14 +92,16 @@ def si_form(number: float, unit: str = '', round_to_decimal_places: int = 2) -> 
         number (float): The number to format.
         unit (str): The unit to append to the formatted number. Default is an empty string.
         round_to_decimal_places (int): The number of decimal places to round the formatted number to. Default is 2.
-    
+        if 0 is after the decimal, it is now omitted
+        
     Returns:
         str: The formatted number with SI prefixes and the provided unit.
     """
     exponent = _get_engineering_exponent(number)
     prefix = _si_prefixes.get(exponent)
-    mantissa = round(number / 10 ** exponent, round_to_decimal_places)
-    return f'{mantissa} {prefix}{unit}' if prefix is not None else f'{mantissa} {unit}'
+    mantissa = str(round(number / 10 ** exponent, round_to_decimal_places)).rstrip('0').rstrip('.')
+    outstr = f'{mantissa} {prefix}{unit}' if prefix is not None else f'{mantissa} {unit}'
+    return outstr.rstrip()
 
 def engineering_form(number: float, unit: str = '', round_to_decimal_places: int = 2) -> str:
     """
@@ -107,13 +111,14 @@ def engineering_form(number: float, unit: str = '', round_to_decimal_places: int
         number (float): The number to format.
         unit (str): The unit to append to the formatted number. Default is an empty string.
         round_to_decimal_places (int): The number of decimal places to round the formatted number to. Default is 2.
-    
+        if 0 is after the decimal, it is now omitted
+
     Returns:
         str: The formatted number in engineering notation with the provided unit.
     """
     exponent = _get_engineering_exponent(number)
-    mantissa = round(number / 10 ** exponent, round_to_decimal_places)
-    return f'{mantissa}{_get_exp_str(exponent)} {unit}'
+    mantissa = str(round(number / 10 ** exponent, round_to_decimal_places)).rstrip('0').rstrip('.')
+    return f'{mantissa}{_get_exp_str(exponent)} {unit}' if unit != '' else f'{mantissa}{_get_exp_str(exponent)}'
 
 # alias functions
 def sif(num:float, uni:str = '', prec:int = 2) -> str:
@@ -130,10 +135,10 @@ def engf(num:float, uni:str = '', prec:int = 2) -> str:
 
 def _test():
     import random
-    value = 15.504E4
+    value = 15.504
     print(f'{value = }')
-    print(f'{si_form(value, "V") = }')
-    print(f'{engineering_form(value, "V") = }')
+    print(f'{si_form(value) = }')
+    print(f'{engineering_form(value) = }')
     print(f'{sif(value, "V") = }')
     print(f'{engf(value, "V") = }')
 
