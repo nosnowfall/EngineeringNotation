@@ -92,13 +92,14 @@ def si_form(number: float, unit: str = '', round_to_decimal_places: int = 2) -> 
         number (float): The number to format.
         unit (str): The unit to append to the formatted number. Default is an empty string.
         round_to_decimal_places (int): The number of decimal places to round the formatted number to. Default is 2.
+        if 0 is after the decimal, it is now omitted
         
     Returns:
         str: The formatted number with SI prefixes and the provided unit.
     """
     exponent = _get_engineering_exponent(number)
     prefix = _si_prefixes.get(exponent)
-    mantissa = str(format(round(number / 10 ** exponent, round_to_decimal_places), f'.{round_to_decimal_places}f')) # part after decimal place
+    mantissa = str(round(number / 10 ** exponent, round_to_decimal_places)).rstrip('0').rstrip('.')
     outstr = f'{mantissa} {prefix}{unit}' if prefix is not None else f'{mantissa} {unit}'
     return outstr.rstrip()
 
@@ -110,12 +111,13 @@ def engineering_form(number: float, unit: str = '', round_to_decimal_places: int
         number (float): The number to format.
         unit (str): The unit to append to the formatted number. Default is an empty string.
         round_to_decimal_places (int): The number of decimal places to round the formatted number to. Default is 2.
+        if 0 is after the decimal, it is now omitted
 
     Returns:
         str: The formatted number in engineering notation with the provided unit.
     """
     exponent = _get_engineering_exponent(number)
-    mantissa = str(format(round(number / 10 ** exponent, round_to_decimal_places), f'.{round_to_decimal_places}f')) # part after decimal place
+    mantissa = str(round(number / 10 ** exponent, round_to_decimal_places)).rstrip('0').rstrip('.')
     return f'{mantissa}{_get_exp_str(exponent)} {unit}' if unit != '' else f'{mantissa}{_get_exp_str(exponent)}'
 
 # alias functions
