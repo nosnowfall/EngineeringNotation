@@ -68,10 +68,10 @@ def _get_engineering_exponent(number:float) -> int:
 def _get_exp_str(exponent:int) -> str:
     """
     Handle printing positive, negative, and zero exponents
-
+    
     Parameters:
         exponent (int): the exponent to be formatted for engineering notation
-
+    
     Returns:
         str: formatted exponent, e.g. E+3 or E-2 or ''
     """
@@ -93,7 +93,6 @@ def si_form(number: float, unit: str = '', round_to_decimal_places: int = 2) -> 
         unit (str): The unit to append to the formatted number. Default is an empty string.
         round_to_decimal_places (int): The number of decimal places to round the formatted number to. Default is 2.
         
-    
     Returns:
         str: The formatted number with SI prefixes and the provided unit.
     """
@@ -112,7 +111,6 @@ def engineering_form(number: float, unit: str = '', round_to_decimal_places: int
         unit (str): The unit to append to the formatted number. Default is an empty string.
         round_to_decimal_places (int): The number of decimal places to round the formatted number to. Default is 2.
 
-    
     Returns:
         str: The formatted number in engineering notation with the provided unit.
     """
@@ -135,12 +133,10 @@ def engf(num:float, uni:str = '', prec:int = 2) -> str:
 
 def _test():
     import random
-    value = 15.504
-    print(f'{value = }')
-    print(f'{si_form(value) = }')
-    print(f'{engineering_form(value) = }')
-    print(f'{sif(value, "V") = }')
-    print(f'{engf(value, "V") = }')
+    value = 15050.504
+    print(f'Value:     {value}')
+    print(f'SI Form:   {si_form(value, 'V')}')
+    print(f'Eng. Form: {engineering_form(value, 'V', 3)}')
 
 if __name__ == '__main__':
     try:
